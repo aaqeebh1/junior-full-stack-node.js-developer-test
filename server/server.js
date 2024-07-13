@@ -1,14 +1,17 @@
 import express from "express";
 import connectToDatabase from "./config/database.js";
 import User from "./models/user.js";
+import cors from "cors";
+import mongoose from "mongoose";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.json());
+app.use(cors({ origin: "http://localhost:3000" }));
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+app.get("/api/users", (req, res) => {
+  res.json({});
 });
 
 app.post("/api/users/register", async (req, res) => {
@@ -26,10 +29,11 @@ app.post("/api/users/register", async (req, res) => {
       firstName,
       lastName,
       email,
-      password, // This will be hashed by the pre-save hook
+      password,
     });
 
     await newUser.save();
+    console.log(User.id);
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
@@ -60,8 +64,15 @@ app.post("/api/users/login", async (req, res) => {
   }
 });
 
-connectToDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
-});
+const startServer = async () => {
+  try {
+    await connectToDatabase();
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+  }
+};
+
+startServer();
