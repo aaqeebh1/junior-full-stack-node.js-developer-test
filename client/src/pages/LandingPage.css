@@ -1,0 +1,36 @@
+.landingPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.landingPage p {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+}
+
+.landingPage h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #007bff;
+}
+
+.landingPage p span {
+    color: #007bff;
+}
+
+@media screen and (max-width: 786px) {
+  .landingPage {
+    padding: 2rem;
+    width: 100%;
+  }
+
+  .landingPage p {
+    font-size: 5vw;
+    text-align: center;
+  }
+    
+}

@@ -1,13 +1,34 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import { Alert, Button } from "@mui/material";
+import undraw_website from "../assets/undraw_website.svg";
+import "./Login.css";
 
 const Login = () => {
   const [login, setLogin] = useState({
     email: "",
     password: "",
   });
-  const handleSubmit = (e) => {
+  const [loginSuccess, setLoginSuccess] = useState(null);
+  const navigate = useNavigate();
+
+  const url = "http://localhost:3001/api/users/login";
+
+  const loginSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login:", login);
+    try {
+      const response = await axios.post(url, login);
+      if (response.data.message === "Login successful") {
+        setLoginSuccess(true);
+        sessionStorage.setItem("authToken", response.data.token);
+        navigate("/landing");
+      }
+    } catch (error) {
+      console.log(error);
+      setLoginSuccess(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -19,35 +40,51 @@ const Login = () => {
 
   return (
     <>
-      <div className="form login-form">
-        <h3>Login</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              placeholder="Enter email"
-              value={login.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Password"
-              value={login.password}
-              onChange={handleChange}
-            />
-          </div>
-          <button type="submit" className="submit-btn">
-            Submit
-          </button>
-        </form>
+      <div className="loginContainer">
+        <div className="login-image">
+          <img src={undraw_website} alt="website" className="loginImg" />
+        </div>
+        <div className="form login-form">
+          <form onSubmit={loginSubmit}>
+            <h3>Login</h3>
+            <div className="form-group">
+              <TextField
+                type="email"
+                id="email"
+                placeholder="Enter Email"
+                value={login.email}
+                label="Email"
+                variant="outlined"
+                size="small"
+                margin="normal"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <TextField
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Password"
+                value={login.password}
+                label="Password"
+                variant="outlined"
+                size="small"
+                margin="normal"
+                onChange={handleChange}
+                color={loginSuccess === false ? "error" : "primary"}
+              />
+            </div>
+            {loginSuccess === false && (
+              <Alert severity="error" className="error-alert">
+                Invalid email or password
+              </Alert>
+            )}
+            <Button type="submit" variant="outlined" className="submit-btn">
+              Login
+            </Button>
+          </form>
+        </div>
       </div>
     </>
   );
