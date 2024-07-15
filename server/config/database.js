@@ -7,8 +7,7 @@ const databaseUri = 'mongodb+srv://aaqeebh1:KIi3Ps9Wtzm4jGrA@cluster0.upgyzfg.mo
 
 const connectToDatabase = async () => { 
     try {
-        const connection = await connect(databaseUri);   
-        console.log('Connected to MongoDB:', connection.connection.name);
+        const connection = await connect(databaseUri);
     } catch (error) {
         console.error('Error connecting to MongoDB:', error )
     }
