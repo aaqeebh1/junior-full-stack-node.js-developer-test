@@ -1,13 +1,18 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
 import "./LandingPage.css";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../state/auth/authSlice";
 
 const LandingPage = () => {
-  const [userData, setUserData] = useState({});
+  const userData = useSelector((state) => state.auth.userData);
+  const dispatch = useDispatch();
   const url = "http://localhost:3001/api/users/profile";
 
+  
   useEffect(() => {
     getUserData();
+    // eslint-disable-next-line
   }, []);
 
   const getUserData = async () => {
@@ -23,7 +28,7 @@ const LandingPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setUserData(response.data);
+      dispatch(setUserData(response.data));
     } catch (error) {
       console.log(error);
     }

@@ -1,17 +1,17 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import { Alert, Button } from "@mui/material";
 import undraw_website from "../assets/undraw_website.svg";
 import "./Login.css";
+import { useDispatch, useSelector } from "react-redux";
+import {setLogin, setLoginSuccess } from "../state/login/loginSlice.js";
 
 const Login = () => {
-  const [login, setLogin] = useState({
-    email: "",
-    password: "",
-  });
-  const [loginSuccess, setLoginSuccess] = useState(null);
+  const login = useSelector((state) => state.login.login);
+  const loginSuccess = useSelector((state) => state.login.loginSuccess);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const url = "http://localhost:3001/api/users/login";
@@ -21,21 +21,21 @@ const Login = () => {
     try {
       const response = await axios.post(url, login);
       if (response.data.message === "Login successful") {
-        setLoginSuccess(true);
+        dispatch(setLoginSuccess(true));
         sessionStorage.setItem("authToken", response.data.token);
         navigate("/landing");
       }
     } catch (error) {
       console.log(error);
-      setLoginSuccess(false);
+      dispatch(setLoginSuccess(false));
     }
   };
 
   const handleChange = (e) => {
-    setLogin({
+    dispatch(setLogin({
       ...login,
       [e.target.id]: e.target.value,
-    });
+    }));
   };
 
   return (

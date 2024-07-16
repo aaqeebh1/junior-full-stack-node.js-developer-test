@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import { Button, Alert } from "@mui/material";
@@ -6,20 +6,30 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../assets/Loading.svg";
 import undraw_users from "../assets/undraw_users.svg";
 import "./Register.css";
+import {
+  setFormData,
+  setConfirmPassword,
+  setPasswordMatch,
+  setEmailError,
+  setPasswordError,
+  setSuccessfulRegister,
+  setUserExists,
+} from "../state/register/registerSlice.js";
+import { useSelector, useDispatch } from "react-redux";
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordMatch, setPasswordMatch] = useState(true);
-  const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
-  const [successfulRegister, setSuccessfulRegister] = useState(false);
-  const [userExists, setUserExists] = useState(false);
+  const formData = useSelector((state) => state.register.formData);
+  const confirmPassword = useSelector(
+    (state) => state.register.confirmPassword
+  );
+  const passwordMatch = useSelector((state) => state.register.passwordMatch);
+  const emailError = useSelector((state) => state.register.emailError);
+  const passwordError = useSelector((state) => state.register.passwordError);
+  const successfulRegister = useSelector(
+    (state) => state.register.successfulRegister
+  );
+  const userExists = useSelector((state) => state.register.userExists);
+  const dispatch = useDispatch();
 
   const url = "http://localhost:3001/api/users/register";
   const navigate = useNavigate();
@@ -27,18 +37,19 @@ const Register = () => {
   const registerUser = async (e) => {
     e.preventDefault();
     if (confirmPassword !== formData.password) {
-      setPasswordMatch(false);
+      dispatch(setPasswordMatch(false));
       return;
     } else if (confirmPassword === formData.password) {
-      setPasswordMatch(true);
+      dispatch(setPasswordMatch(true));
       try {
         await axios.post(url, formData);
-        setSuccessfulRegister(true);
+        dispatch(setSuccessfulRegister(true));
         setTimeout(() => {
           navigate("/login");
+          dispatch(setSuccessfulRegister(false));
         }, 3000);
       } catch (error) {
-        setUserExists(true);
+        dispatch(setUserExists(true));
         console.log(error);
       }
     }
@@ -48,9 +59,9 @@ const Register = () => {
     if (e.target.id === "email") {
       const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value);
       if (!isValidEmail) {
-        setEmailError(true);
+        dispatch(setEmailError(true));
       } else {
-        setEmailError(false);
+        dispatch(setEmailError(false));
       }
     }
     if (e.target.id === "password") {
@@ -59,20 +70,24 @@ const Register = () => {
           e.target.value
         );
       if (!isValidPassword) {
-        setPasswordError(true);
+        dispatch(setPasswordError(true));
       } else {
-        setPasswordError(false);
+        dispatch(setPasswordError(false));
       }
     }
-    setFormData({
-      ...formData,
-      [e.target.id]:
-        e.target.id === "email" ? e.target.value.toLowerCase() : e.target.value,
-    });
+    dispatch(
+      setFormData({
+        ...formData,
+        [e.target.id]:
+          e.target.id === "email"
+            ? e.target.value.toLowerCase()
+            : e.target.value,
+      })
+    );
   };
 
   const handleConfrimPassword = (e) => {
-    setConfirmPassword(e.target.value);
+    dispatch(setConfirmPassword(e.target.value));
   };
 
   return (
@@ -92,8 +107,8 @@ const Register = () => {
           />
         </div>
       ) : (
-          <div className="registerContainer">
-            <img src={undraw_users} alt="" className="registerImg"/>
+        <div className="registerContainer">
+          <img src={undraw_users} alt="" className="registerImg" />
           <div className="form register-form">
             <form onSubmit={registerUser}>
               <h3>Register</h3>
